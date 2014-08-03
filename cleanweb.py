@@ -48,7 +48,7 @@ class Cleanweb(object):
 
         try:
             r = self.request('post', 'http://cleanweb-api.yandex.ru/1.0/check-spam', data=data)
-        except CleanwebError:
+        except (CleanwebError, requests.ConnectionError):
             # Try to return fake result to hide cleanweb errors
             return {
                 'id': -1,
@@ -71,7 +71,7 @@ class Cleanweb(object):
 
         try:
             r = self.request('get', 'http://cleanweb-api.yandex.ru/1.0/get-captcha', params=payload)
-        except CleanwebError:
+        except (CleanwebError, requests.ConnectionError):
             if not self.fake_captcha:
                 raise KeyError("CleanWeb responed with error and we can't build fake query. "
                                "You should set fake captcha")
@@ -90,7 +90,7 @@ class Cleanweb(object):
                    'id': id}
         try:
             r = self.request('get', 'http://cleanweb-api.yandex.ru/1.0/check-captcha', params=payload)
-        except CleanwebError:
+        except (CleanwebError, requests.ConnectionError):
             return True
 
         root = ET.fromstring(r.content)
@@ -104,7 +104,7 @@ class Cleanweb(object):
         try:
             r = self.request('post', 'http://cleanweb-api.yandex.ru/1.0/complain',
                              data={'id': id, 'spamtype': 'spam' if is_spam else 'ham'})
-        except CleanwebError:
+        except (CleanwebError, requests.ConnectionError):
             pass
 
         return True
